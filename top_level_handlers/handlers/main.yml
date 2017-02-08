@@ -1,0 +1,22 @@
+---
+- name: apply raspi-config
+  command: raspi-config --apply-os-config
+  # using the Ansible blog post solution:
+  # https://support.ansible.com/hc/en-us/articles/201958037-Reboot-a-server-and-wait-for-it-to-come-back
+
+- name: reboot
+  command: /sbin/shutdown -r now
+  #shell: sleep 2 && shutdown -r now "Ansible updates triggered"
+  async: 0
+  poll: 0
+  ignore_errors: true   # Keep true, otherwise it will error out.
+  no_log: True
+  
+- name: wait for reboot
+  local_action:
+    module: wait_for
+      host="{{ inventory_hostname }}"
+      port=22
+      delay=10
+      timeout=300
+  sudo: false

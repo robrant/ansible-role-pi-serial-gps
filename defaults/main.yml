@@ -1,0 +1,12 @@
+# Enable the camera?
+raspi_config_enable_camera: yes
+
+# Version of python picamera to install
+python_picamera_version: 1.10
+
+# The amount of RAM available to the GPU, takes away from main memory.
+# Can be: 16, 64, 128 or 256
+raspi_config_memory_split_gpu: 16
+
+# Picamera requires a minimum of 128MB RAM
+raspi_config_min_camera_mem: 128
