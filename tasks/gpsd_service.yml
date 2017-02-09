@@ -1,0 +1,56 @@
+---
+
+# Enable uart access (Raspberry Pi 3)
+- name: camera - set state
+  pi_boot_config: config_vals=enable_uart=true
+  when: pi_major_version >= 3
+  # **UNTESTED - placeholder**
+
+# install GPSD and GPSD Clients
+- name: Install GPSD adn clients
+  apt: name={{ item }} state=latest
+  with_items:
+    - gpsd
+    - gpsd-clients
+
+# Edit the cmdline text file to remove serial reference
+- name: Edit /boot/cmdline.txt
+  replace:
+    path: "/boot/cmdline.txt"
+    regexp: 'console=serial0,115200'
+    backup: yes
+
+# Stop and disable the serial getty service
+- name: Stop & disable serial-getty service
+  service: name=serial-getty@ttyAMA0.service state=stopped enabled=no
+
+# Configure the gpsd socket ListenStream
+- name: Configure gpsd socket ListenStream
+  replace:
+    path: "/lib/systemd/system/gpsd.socket"
+    regex: '^ListenStream=127.0.0.1:2947'
+    replace: 'ListenStream=0.0.0.0:2947'
+    backup: yes
+
+# Specify the device that gpsd service uses
+- name: Specify gpsd device in /etc/default/gpsd
+  lineinfile:
+    dest: /etc/default/gpsd
+    regexp: '^DEVICES=.*'
+    line: DEVICES=""/dev/serial0"
+
+# Force the pi config and reboot
+-  debug: msg="Config Reload and Reboot"
+   notify:
+    - apply raspi-config
+    - reboot
+    - wait for reboot
+   changed_when: true
+
+# Force it to run these ^ handlers now, rather than at the end.
+- meta: flush_handlers
+
+# Start the gpsd service
+# TODO: Need to switch this to systemd ansible command
+- name: Start the gpsd service
+  service: name=gpsd state=started enabled=yes

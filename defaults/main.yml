@@ -1,12 +1,15 @@
-# Enable the camera?
-raspi_config_enable_camera: yes
+# Include python bindings
+install_python_binding: true
 
-# Version of python picamera to install
-python_picamera_version: 1.10
+# Test gps data being received
+test_data_input: true
 
-# The amount of RAM available to the GPU, takes away from main memory.
-# Can be: 16, 64, 128 or 256
-raspi_config_memory_split_gpu: 16
+#  Which version of python gpsd to install
+python_gpsd_version: 0.33.3
 
-# Picamera requires a minimum of 128MB RAM
-raspi_config_min_camera_mem: 128
+# Which version of the Raspberry Pi hardware?
+# ** UNTESTED **
+pi_major_version: 1
+
+# Whether to run the gps data check
+run_gps_data_check: true

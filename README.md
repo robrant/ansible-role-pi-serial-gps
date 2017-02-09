@@ -1,7 +1,7 @@
 
 # About
 
-Ansible role to configure a Raspberry Pi to connect to a GPS device over serial.
+Ansible role to configure a Raspberry Pi to connect to a GPS device over serial. It also installs the [`gps3` python binding](https://pypi.python.org/pypi/gps3/).
 
 # Dependencies
 
@@ -9,8 +9,8 @@ Ansible role to configure a Raspberry Pi to connect to a GPS device over serial.
 with the a GP-20U7. You can read more about it at https://robrant.github.io.
 
 * It has been tested on Raspberry Pi B+, but should work on all versions before
-Raspberry Pi 3. Raspberry Pi 3 introduces (at least) 1 breaking change in that
-the Serial/UART GPIO pins is disabled by default. When I have a Raspberry Pi 3
+Raspberry Pi 3. Raspberry Pi 3 introduces (at least) 1 breaking change.
+The Serial/UART GPIO pins is disabled by default. When I have a Raspberry Pi 3
 to test with, I'll make changes to make it handle all Pi versions.
 
 # Usage

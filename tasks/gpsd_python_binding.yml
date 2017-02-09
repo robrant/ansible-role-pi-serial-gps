@@ -1,0 +1,8 @@
+---
+# Check pip is installed
+- name: Install pip
+  apt: name=python-pip state=latest
+
+# Install python binding for gpsd
+- name: Install GPSD python binding
+  pip: name="gps3" version={{ python_gpsd_version }}

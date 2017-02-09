@@ -1,59 +1,12 @@
 ---
-# Configure the pi to take photos
 
-- name: camera - ensure memory
-  pi_boot_config: config_vals=gpu_mem=16
-  when: raspi_config_enable_camera and raspi_config_memory_split_gpu < raspi_config_min_camera_mem
-  # TODO: This needs work. Setting it to 128 on the B+ makes it perform poorly.
+- name: Include gpsd install plays
+  include: gpsd_service.yml
 
-- name: camera - set state
-  pi_boot_config: config_vals=start_x={{raspi_config_enable_camera|int}}
+- name: Include gpsd python binding plays
+  include: gpsd_python_binding.yml
+  when: install_python_binding
 
-# Force the pi config and reboot
--  debug: msg="Config Reload and Reboot"
-   notify:
-    - apply raspi-config
-    - reboot
-    - wait for reboot
-   changed_when: true
-
-# Force it to run these ^ handlers now, rather than at the end.
-- meta: flush_handlers
-
-# Take a photo, dump out any output and errors and check photo exists
-- name: Take a photo
-  command: raspistill -v -o /tmp/test.jpg
-  register: raspi_camera_debug
-
-- debug: msg="{{ raspi_camera_debug.stdout }}"
-- debug: msg="{{ raspi_camera_debug.stderr }}"
-
-- name: Check presence of photo
-  stat: path=/tmp/test.jpg
-  register: stat_result
-
-- fail: msg="Camera didn't write out file /tmp/test.jpg."
-  when: stat_result.stat.exists == False
-
-# Capture video, dump out any output and errors and check video exists
-- name: Take a 5 second video
-  command: raspivid -t 5000 -o /tmp/video.h264
-  register: raspi_camera_debug
-
-- debug: msg="{{ raspi_camera_debug.stdout }}"
-- debug: msg="{{ raspi_camera_debug.stderr }}"
-
-- name: Check presence of video
-  stat: path=/tmp/video.h264
-  register: stat_result
-
-- fail: msg="Camera didn't write out /tmp/video.h264."
-  when: stat_result.stat.exists == False
-
-# install python picamera library
-# The 1.12 version results in a black screen
-- name: Install pip
-  apt: name=python-pip state=latest
-
-- name: Install picamera version 1.10
-  pip: name="picamera[array]" version={{ python_picamera_version }}
+- name: Test GPS data access (with python)
+  include: gps_data_check.yml
+  when: run_gps_data_check and install_python_binding
